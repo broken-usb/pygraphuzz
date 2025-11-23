@@ -22,9 +22,9 @@ def executar_modo_terminal():
     # Loop principal do modo terminal: lê entradas, calcula e mostra resultados
     while True:
         limpar_tela()
-        print("========================================")
-        print("    SISTEMA DE ORÇAMENTO                ")
-        print("========================================")
+        print("================")
+        print("PyGraphUzz - CLI")
+        print("================")
         print("Digite 'sair' a qualquer momento para fechar.\n")
 
         try:

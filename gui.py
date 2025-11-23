@@ -8,7 +8,7 @@ class FuzzyApp:
     # Constrói widgets, lê entradas do usuário e mostra o resultado
     def __init__(self, root):
         self.root = root
-        self.root.title("Sistema de Orçamento Fuzzy")
+        self.root.title("PyGraphUzz - TKinter")
         self.root.geometry("400x450")
         
         self.ultimo_duracao = 0
