@@ -15,11 +15,17 @@ Abra o seu terminal no local que deseja baixar o projeto e execute:
 git clone "https://github.com/broken-usb/pygraphuzz.git"
 ```
 
+Depois entre na pasta do projeto:
+
+```bash
+cd pygraphuzz
+```
+
 ### 2 Criar o Ambiente Virtual (.venv)
 
 É recomendável criar um ambiente virtual para não misturar as dependências.
 
-  * **Linux / macOS:**
+  * **Linux / Unix:**
 
     ```bash
     python3 -m venv .venv
@@ -33,7 +39,7 @@ git clone "https://github.com/broken-usb/pygraphuzz.git"
 
 ### Ativar o Ambiente Virtual
 
-  * **Linux / macOS:**
+  * **Linux / Unix:**
 
     ```bash
     source .venv/bin/activate
@@ -61,8 +67,14 @@ pip install -r requirements.txt
 
 ## Como Executar
 
-Para iniciar o programa, execute o arquivo principal. Um menu será exibido perguntando se deseja iniciar a **Interface Gráfica** ou o **Modo Terminal**.
+Para iniciar o programa, execute o arquivo principal.
 
 ```bash
 python main.py
+```
+
+ou
+
+```bash
+python3 main.py
 ```
