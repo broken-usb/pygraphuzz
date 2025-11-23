@@ -66,7 +66,7 @@ class FuzzyApp:
         self.label_titulo.pack(pady=(0, 25))
 
         # Input: duração
-        self.label_duracao = ttk.Label(main_frame, text="Duração do Serviço (0 a 24h):")
+        self.label_duracao = ttk.Label(main_frame, text="Duração do Serviço (0 a 42h):")
         self.label_duracao.pack(anchor="w")
 
         # Campo de texto para duração
@@ -126,8 +126,8 @@ class FuzzyApp:
 
             duracao = float(duracao_texto.replace(',', '.'))
 
-            if duracao < 0 or duracao > 24:
-                 messagebox.showwarning("Atenção", "A duração deve ser entre 0 e 24 horas.")
+            if duracao < 0 or duracao > 42:
+                 messagebox.showwarning("Atenção", "A duração deve ser entre 0 e 42 horas.")
                  return
 
             dificuldade = float(self.scale_dificuldade.get())
