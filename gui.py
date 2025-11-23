@@ -4,6 +4,8 @@ import fuzzy_logic
 import graphy
 
 class FuzzyApp:
+    # Interface gráfica principal da aplicação
+    # Constrói widgets, lê entradas do usuário e mostra o resultado
     def __init__(self, root):
         self.root = root
         self.root.title("Sistema de Orçamento Fuzzy")
@@ -13,6 +15,7 @@ class FuzzyApp:
         self.ultimo_dificuldade = 0
         self.calculo_realizado = False
 
+        # Cabeçalho
         self.label_titulo = tk.Label(root, text="Orçamento de Serviço", font=("Arial", 16, "bold"))
         self.label_titulo.pack(pady=20)
 
@@ -22,7 +25,7 @@ class FuzzyApp:
         self.entry_duracao = tk.Entry(root, font=("Arial", 12), justify='center')
         self.entry_duracao.pack(pady=5)
 
-        # Barrinha para escolher a dificuldade
+        # Barrinha para escolher a dificuldade (entrada 2)
         self.label_dificuldade = tk.Label(root, text="Nível de Dificuldade (0 a 10):", font=("Arial", 10))
         self.label_dificuldade.pack(pady=(15, 0)) # Mais espaço em cima
 
@@ -30,7 +33,7 @@ class FuzzyApp:
         self.scale_dificuldade.set(5) # Valor inicial no meio
         self.scale_dificuldade.pack(pady=5)
 
-        # O botao de calcular
+        # Botão que dispara o cálculo fuzzy
         self.btn_calcular = tk.Button(root, text="CALCULAR PREÇO", 
                                       bg="#4CAF50", fg="white", font=("Arial", 10, "bold"),
                                       command=self.realizar_calculo) # Chama a função ao clicar
@@ -43,7 +46,7 @@ class FuzzyApp:
         self.label_valor_final = tk.Label(root, text="R$ 0.00", font=("Arial", 20, "bold"), fg="#333")
         self.label_valor_final.pack(pady=5)
 
-        # O botao dos graficos
+        # Botão para abrir os gráficos explicativos (ativa após cálculo)
         self.btn_grafico = tk.Button(root, text="Ver Gráficos Explicativos", 
                                      command=self.abrir_graficos, state="disabled") # Começa desativado
         self.btn_grafico.pack(pady=20)
@@ -60,7 +63,7 @@ class FuzzyApp:
                 return
 
             # Troca a virgula por um ponto, para que o Python consiga entender
-            # (Culpa dos Gringos que usam ponto como separador decimal)
+            # (aceita tanto ',' quanto '.')
             duracao = float(duracao_texto.replace(',', '.'))
 
             if duracao < 0 or duracao > 24:
@@ -69,7 +72,7 @@ class FuzzyApp:
 
             dificuldade = float(self.scale_dificuldade.get())
 
-            # Efetua os calculos Fuzzy
+            # Efetua os calculos Fuzzy: obtém graus, aplica regras e defuzzifica
             graus_dur = fuzzy_logic.calcular_graus_duracao(duracao)
             graus_dif = fuzzy_logic.calcular_graus_dificuldade(dificuldade)
             regras = fuzzy_logic.calcular_regras(graus_dur, graus_dif)
@@ -77,7 +80,7 @@ class FuzzyApp:
 
             self.label_valor_final.config(text=f"R$ {valor_final:.2f}", fg="#2E7D32")
             
-            # Salva tudo e permite o usuario a ver os graficos
+            # Salva entradas para uso na visualização dos gráficos
             self.ultimo_duracao = duracao
             self.ultimo_dificuldade = dificuldade
             self.calculo_realizado = True
@@ -87,6 +90,7 @@ class FuzzyApp:
             messagebox.showerror("Erro", "O valor da duração deve ser numérico.")
 
     def abrir_graficos(self):
+        # Abre a janela de gráficos somente se um cálculo foi realizado
         if self.calculo_realizado:
             graphy.plotar_graficos_reais(self.ultimo_duracao, self.ultimo_dificuldade)
 

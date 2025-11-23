@@ -1,5 +1,7 @@
 def pertinencia_triangular(x, a, b, c):
-    #Grau de pertinencia triangular.
+    # Grau de pertinencia triangular.
+    # Retorna um valor entre 0 e 1 informando o quanto `x` pertence
+    # ao conjunto descrito pelos pontos (a,b,c).
     
     # Pico
     if x == b:
@@ -40,6 +42,7 @@ def calcular_graus_duracao(tempo):
 
 def calcular_graus_dificuldade(nivel):
     graus = {}
+    # Calcula os graus de pertinência para o nível de dificuldade
     
     # Grafico do Facil (Trapezio)
     if nivel <= 0:
@@ -63,19 +66,19 @@ def calcular_regras(graus_duracao, graus_dificuldade):
     grau_justo = 0.0
     grau_caro = 0.0
     
-    # Barato
+    # Regras que levam à saída 'barato'
     regra1 = min(graus_duracao['curto'], graus_dificuldade['facil'])
     regra2 = min(graus_duracao['curto'], graus_dificuldade['media'])
     regra3 = min(graus_duracao['medio'], graus_dificuldade['facil'])
     grau_barato = max(regra1, regra2, regra3)
 
-    # Justo
+    # Regras que levam à saída 'justo'
     regra4 = min(graus_duracao['curto'], graus_dificuldade['dificil'])
     regra5 = min(graus_duracao['medio'], graus_dificuldade['media'])
     regra6 = min(graus_duracao['longo'], graus_dificuldade['facil'])
     grau_justo = max(regra4, regra5, regra6)
 
-    # Caro
+    # Regras que levam à saída 'caro'
     regra7 = min(graus_duracao['medio'], graus_dificuldade['dificil'])
     regra8 = min(graus_duracao['longo'], graus_dificuldade['media'])
     regra9 = min(graus_duracao['longo'], graus_dificuldade['dificil'])
@@ -106,6 +109,7 @@ def defuzzificar(resultados_regras):
         divida += x * grau_final
         divisor += grau_final
         
+    # Se nenhuma regra ativou, retornamos zero para evitar divisão por zero
     if divisor == 0:
         return 0.0
         

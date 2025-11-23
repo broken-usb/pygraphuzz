@@ -2,12 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import fuzzy_logic as fuzzy
 
+# Responsável por desenhar os gráficos explicativos
+# - Mostra funções de pertinência das entradas
+# - Mostra a agregação e o resultado da defuzzificação
+
 def plotar_graficos_reais(duracao_val, dificuldade_val):
     x_duracao = np.linspace(0, 24, 500)
     x_dificuldade = np.linspace(0, 10, 500)
     x_preco = np.linspace(0, 1000, 500)
 
-    # Calculamos a ativação
+    # Calculamos a ativação usando as funções do módulo fuzzy
     graus_dur = fuzzy.calcular_graus_duracao(duracao_val)
     graus_dif = fuzzy.calcular_graus_dificuldade(dificuldade_val)
     regras = fuzzy.calcular_regras(graus_dur, graus_dif)
@@ -15,6 +19,7 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
 
     fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(8, 10))
 
+    # Funções de pertinência para a duração (curto/médio/longo)
     y_curto = [fuzzy.pertinencia_triangular(x, 0, 0, 12) for x in x_duracao]
     y_medio = [fuzzy.pertinencia_triangular(x, 0, 12, 24) for x in x_duracao]
     y_longo = [fuzzy.pertinencia_triangular(x, 12, 24, 24) for x in x_duracao]
@@ -27,6 +32,7 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
     ax0.set_title('Entrada 1: Duração do Serviço (0-24h)')
     ax0.legend()
 
+    # Funções de pertinência para a dificuldade (fácil/média/difícil)
     y_facil = [fuzzy.pertinencia_triangular(x, 0, 0, 5) for x in x_dificuldade]
     y_media = [fuzzy.pertinencia_triangular(x, 0, 5, 10) for x in x_dificuldade]
     y_dificil = [fuzzy.pertinencia_triangular(x, 5, 10, 10) for x in x_dificuldade]
@@ -39,6 +45,7 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
     ax1.set_title('Entrada 2: Nível de Dificuldade')
     ax1.legend()
 
+    # Funções de pertinência para o preço (saída)
     y_barato = [fuzzy.pertinencia_triangular(x, 0, 0, 500) for x in x_preco]
     y_justo = [fuzzy.pertinencia_triangular(x, 0, 500, 1000) for x in x_preco]
     y_caro = [fuzzy.pertinencia_triangular(x, 500, 1000, 1000) for x in x_preco]
@@ -47,6 +54,7 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
     ax2.plot(x_preco, y_justo, 'g--', linewidth=0.5)
     ax2.plot(x_preco, y_caro, 'r--', linewidth=0.5)
 
+    # Aplica truncamento (clipping) pelas ativações das regras e agrega
     ativacao_b = np.fmin(regras['barato'], y_barato)
     ativacao_j = np.fmin(regras['justo'], y_justo)
     ativacao_c = np.fmin(regras['caro'], y_caro)

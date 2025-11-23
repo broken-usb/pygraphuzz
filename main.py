@@ -4,6 +4,10 @@ import fuzzy_logic
 import graphy
 import gui
 
+# Programa principal / launcher
+# Este arquivo fornece duas formas de execução do sistema:
+# - Modo terminal: interação por linha de comando (função `executar_modo_terminal`).
+# - Modo gráfico: abre a interface Tkinter (função `executar_modo_grafico`).
 def limpar_tela():
     # Limpa a tela do terminal
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -15,6 +19,7 @@ def executar_modo_terminal():
     # Foi utilizado para testar a logica fuzzy antes de implementar a GUI
     janela_escolha.destroy()
     
+    # Loop principal do modo terminal: lê entradas, calcula e mostra resultados
     while True:
         limpar_tela()
         print("========================================")
@@ -42,7 +47,7 @@ def executar_modo_terminal():
                 input("Enter para continuar...")
                 continue
 
-            # Calculos Fuzzy
+            # Calculos Fuzzy: calcula graus, aplica regras e defuzzifica
             print("\nCalculando...")
             graus_dur = fuzzy_logic.calcular_graus_duracao(duracao)
             graus_dif = fuzzy_logic.calcular_graus_dificuldade(dificuldade)
@@ -97,4 +102,5 @@ def iniciar_launcher():
     janela_escolha.mainloop()
 
 if __name__ == "__main__":
+    # Ponto de entrada: inicia o launcher que permite escolher o modo
     iniciar_launcher()
