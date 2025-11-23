@@ -23,7 +23,8 @@ def executar_modo_terminal():
     while True:
         limpar_tela()
         print("========================================")
-        print("    SISTEMA DE ORÇAMENTO                ")
+        print("    PyGraphUzz | CLI                    ")
+        print("Sistema de Orçamento Fuzzy              ")
         print("========================================")
         print("Digite 'sair' a qualquer momento para fechar.\n")
 

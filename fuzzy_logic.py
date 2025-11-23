@@ -90,7 +90,11 @@ def calcular_regras(graus_duracao, graus_dificuldade):
         'caro': grau_caro
     }
 
-def defuzzificar(resultados_regras):
+def defuzzificar(resultados_regras, metodo='mamdani'):
+    """
+    Calcula o valor final (Centroide).
+    metodo: 'mamdani' (corte/min) ou 'larsen' (produto/escala)
+    """
     divida = 0.0
     divisor = 0.0
     passo = 10
@@ -100,16 +104,23 @@ def defuzzificar(resultados_regras):
         pert_justo  = pertinencia_triangular(x, 0, 500, 1000)
         pert_caro   = pertinencia_triangular(x, 500, 1000, 1000)
         
-        ativacao_barato = min(pert_barato, resultados_regras['barato'])
-        ativacao_justo  = min(pert_justo, resultados_regras['justo'])
-        ativacao_caro   = min(pert_caro, resultados_regras['caro'])
+        if metodo == 'mamdani':
+            # Método MAMDANI (Minimização / Corte)
+            ativacao_barato = min(pert_barato, resultados_regras['barato'])
+            ativacao_justo  = min(pert_justo, resultados_regras['justo'])
+            ativacao_caro   = min(pert_caro, resultados_regras['caro'])
+        else:
+            # Método LARSEN (Produto / Escala)
+            ativacao_barato = pert_barato * resultados_regras['barato']
+            ativacao_justo  = pert_justo * resultados_regras['justo']
+            ativacao_caro   = pert_caro * resultados_regras['caro']
         
+        # Agregação (Sempre usamos o MAX para juntar as formas)
         grau_final = max(ativacao_barato, ativacao_justo, ativacao_caro)
         
         divida += x * grau_final
         divisor += grau_final
         
-    # Se nenhuma regra ativou, retornamos zero para evitar divisão por zero
     if divisor == 0:
         return 0.0
         
