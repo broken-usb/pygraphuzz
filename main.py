@@ -1,7 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
 import os
-import sys
 import fuzzy_logic
 import graphy
 import gui
