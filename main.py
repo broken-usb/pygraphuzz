@@ -3,7 +3,7 @@ import os
 import fuzzy_logic
 import graphy
 import gui
-
+#
 # Programa principal / launcher
 # Este arquivo fornece duas formas de execução do sistema:
 # - Modo terminal: interação por linha de comando (função `executar_modo_terminal`).
