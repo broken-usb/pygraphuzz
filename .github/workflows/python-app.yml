@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-    # Vamos rodar em uma Matriz: Linux e Windows
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -21,9 +20,7 @@ jobs:
     - name: Configurar Python 3.12
       uses: actions/setup-python@v4
       with:
-        python-version: "3.12" 
-        # Usei 3.12 pois é a versão estável atual em CI. 
-        # A 3.14 ainda é instável/alpha para CI.
+        python-version: "3.12"
 
     - name: Instalar dependências
       run: |
@@ -32,6 +29,4 @@ jobs:
         # Instalamos o pytest se quiser usar no futuro, mas o unittest é nativo
     
     - name: Rodar Testes (Lógica Apenas)
-      # Aqui rodamos o arquivo de teste que criamos.
-      # Ele não abre janelas, então não vai travar o servidor.
       run: python git_test.py
