@@ -1,12 +1,11 @@
 name: Build e Release Automático
 
-on: 
-    workflow_dispatch:
-
-    push:
-        branches: [ "*" ]
-    pull_request:
-        branches: [ "*" ]
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
 
 jobs:
   build:
@@ -14,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-24.04, windows-latest]
 
     steps:
     - uses: actions/checkout@v4
@@ -24,28 +23,79 @@ jobs:
       with:
         python-version: "3.12"
 
+    # --- SETUP ESPECÍFICO DE LINUX ---
     - name: Instalar Dependências do Sistema (Linux)
       if: runner.os == 'Linux'
-      run: sudo apt update && sudo apt install -y python3-full
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-full fuse libfuse2 file
 
+    # --- INSTALAÇÃO GERAL ---
     - name: Instalar Dependências Python
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
 
-    - name: Rodar Testes (Garantia de Qualidade)
+    - name: Rodar Testes
       run: python git_test.py
-    
-    - name: Criar Executável com PyInstaller
-      # --onefile: Cria um arquivo único (sem pastas)
-      # --windowed: Não abre a tela preta do terminal ao fundo
-      # --name: Nome do arquivo final
-      run: |
-        pyinstaller --onefile --windowed --name "OrcamentoFuzzy" main.py
 
-    - name: Upload do Executável (Artifact)
+    # --- BUILD WINDOWS (.EXE) ---
+    - name: Gerar Executável Windows
+      if: runner.os == 'Windows'
+      # --onefile: Gera o .exe portátil único
+      run: |
+        pyinstaller --onefile --windowed --name "PyGraphUzz" main.py
+
+    # --- BUILD LINUX (APPIMAGE) ---
+    - name: Preparar AppImage (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        # 1. Gerar binário em modo PASTA (--onedir)
+        pyinstaller --onedir --windowed --name "PyGraphUzz" main.py
+        
+        # 2. Criar estrutura do AppDir
+        mkdir -p AppDir/usr/bin
+        cp -r dist/PyGraphUzz/* AppDir/usr/bin/
+        
+        # 3. Criar ícone temporário (um quadrado azul simples)
+        # O AppImage exige um ícone.
+        convert -size 256x256 xc:blue AppDir/pygraphuzz.png || touch AppDir/pygraphuzz.png
+        
+        # 4. Criar arquivo .desktop (Atalho do Linux)
+        echo "[Desktop Entry]" > AppDir/pygraphuzz.desktop
+        echo "Type=Application" >> AppDir/pygraphuzz.desktop
+        echo "Name=PyGraphUzz" >> AppDir/pygraphuzz.desktop
+        echo "Exec=PyGraphUzz" >> AppDir/pygraphuzz.desktop
+        echo "Icon=pygraphuzz" >> AppDir/pygraphuzz.desktop
+        echo "Categories=Utility;" >> AppDir/pygraphuzz.desktop
+        echo "Terminal=false" >> AppDir/pygraphuzz.desktop
+        
+        # 5. Criar o AppRun (o script que roda ao clicar)
+        ln -s usr/bin/PyGraphUzz AppDir/AppRun
+        
+        # 6. Baixar o AppImageTool
+        wget -O appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+        chmod +x appimagetool
+        
+        # 7. Gerar o AppImage final
+        # ARCH=x86_64 define a arquitetura para evitar erros no CI
+        ARCH=x86_64 ./appimagetool AppDir PyGraphUzz-Linux.AppImage
+
+    # --- UPLOAD DOS ARTEFATOS ---
+    
+    # Upload Windows
+    - name: Upload Windows Exe
+      if: runner.os == 'Windows'
       uses: actions/upload-artifact@v4
       with:
-        name: PyGraphUzz-${{ runner.os }}
-        path: dist/
+        name: PyGraphUzz-Windows-Exe
+        path: dist/PyGraphUzz.exe
+
+    # Upload Linux
+    - name: Upload Linux AppImage
+      if: runner.os == 'Linux'
+      uses: actions/upload-artifact@v4
+      with:
+        name: PyGraphUzz-Linux-AppImage
+        path: PyGraphUzz-Linux.AppImage
