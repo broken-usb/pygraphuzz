@@ -3,7 +3,8 @@ import numpy as np
 import fuzzy_logic as fuzzy
 
 def plotar_graficos_reais(duracao_val, dificuldade_val):
-    # Valores X para os gráficos
+    # Plota três gráficos explicativos: duração, dificuldade e saída (preço).
+    # Os arrays X servem para desenhar as funções de pertinência suavemente.
     x_duracao = np.linspace(0, 42, 500)
     x_dificuldade = np.linspace(0, 10, 500)
     x_preco = np.linspace(0, 2000, 500)
@@ -16,22 +17,20 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
     fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, figsize=(10, 12))
     plt.subplots_adjust(hspace=0.4) 
 
-    # Duração: curvas de pertinência
-    y_curto = [fuzzy.pertinencia_triangular(x, 0, 0, 8) for x in x_duracao]
+    # TEMPO
+    # Curvas de pertinência para as etiquetas de duração (visualização).
+    y_curto = [fuzzy.pertinencia_trapezoidal(x, -100, 0, 0, 8) for x in x_duracao]
     y_leve = [fuzzy.pertinencia_triangular(x, 6, 10, 14) for x in x_duracao]
     y_longo = [fuzzy.pertinencia_triangular(x, 12, 18, 24) for x in x_duracao]
-
-    # Muito longo: força 1.0 a partir de 40h
-    y_mlongo = [1.0 if x >= 40 else fuzzy.pertinencia_triangular(x, 20, 40, 40) for x in x_duracao]
+    y_mlongo = [fuzzy.pertinencia_trapezoidal(x, 20, 40, 100, 100) for x in x_duracao]
 
     ax0.plot(x_duracao, y_curto, 'b', label='Curto')
     ax0.plot(x_duracao, y_leve, 'c', label='Leve. Longo')
     ax0.plot(x_duracao, y_longo, 'g', label='Longo')
     ax0.plot(x_duracao, y_mlongo, 'r', label='Muito Longo')
-    
     ax0.axvline(x=duracao_val, color='k', linestyle='--', linewidth=2, label=f'Entrada: {duracao_val}h')
 
-    # Pontos de ativação (mostra o grau nas entradas)
+    # Marca os pontos de ativação para a entrada atual
     cores_map_dur = {'curto': 'b', 'levemente_longo': 'c', 'longo': 'g', 'muito_longo': 'r'}
     for termo, valor in graus_dur.items():
         if valor > 0:
@@ -42,16 +41,18 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
     ax0.set_title('Entrada 1: Duração (0-42h)')
     ax0.legend(loc='upper right')
 
-    # Dificuldade: curvas
-    y_facil = [fuzzy.pertinencia_triangular(x, 0, 0, 5) for x in x_dificuldade]
+    # DIFICULDADE
+    # Curvas para fácil/média/difícil
+    y_facil = [fuzzy.pertinencia_trapezoidal(x, -10, 0, 0, 5) for x in x_dificuldade]
     y_media = [fuzzy.pertinencia_triangular(x, 0, 5, 10) for x in x_dificuldade]
-    y_dificil = [fuzzy.pertinencia_triangular(x, 5, 10, 10) for x in x_dificuldade]
+    y_dificil = [fuzzy.pertinencia_trapezoidal(x, 5, 10, 20, 20) for x in x_dificuldade]
 
     ax1.plot(x_dificuldade, y_facil, 'b', label='Fácil')
     ax1.plot(x_dificuldade, y_media, 'g', label='Média')
     ax1.plot(x_dificuldade, y_dificil, 'r', label='Difícil')
     ax1.axvline(x=dificuldade_val, color='k', linestyle='--', label=f'Entrada: {dificuldade_val}')
 
+    # Pontos de ativação para dificuldade
     cores_map_dif = {'facil': 'b', 'media': 'g', 'dificil': 'r'}
     for termo, valor in graus_dif.items():
         if valor > 0:
@@ -62,18 +63,19 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
     ax1.set_title('Entrada 2: Dificuldade')
     ax1.legend(loc='upper right')
 
-    # Saída: funções de preço
-    y_barato = [fuzzy.pertinencia_triangular(x, 0, 0, 600) for x in x_preco]
+    # SAIDA
+    # Curvas de saída (barato/justo/caro/muito caro) e área ativada
+    y_barato = [fuzzy.pertinencia_trapezoidal(x, -500, 0, 0, 600) for x in x_preco]
     y_justo  = [fuzzy.pertinencia_triangular(x, 400, 800, 1200) for x in x_preco]
     y_caro   = [fuzzy.pertinencia_triangular(x, 1000, 1400, 1800) for x in x_preco]
-    y_mcaro  = [fuzzy.pertinencia_triangular(x, 1600, 2000, 2000) for x in x_preco]
+    y_mcaro  = [fuzzy.pertinencia_trapezoidal(x, 1600, 2000, 3000, 3000) for x in x_preco]
 
     ax2.plot(x_preco, y_barato, 'b:', alpha=0.5)
     ax2.plot(x_preco, y_justo, 'g:', alpha=0.5)
     ax2.plot(x_preco, y_caro, 'orange', linestyle=':', alpha=0.5)
     ax2.plot(x_preco, y_mcaro, 'r:', alpha=0.5)
 
-    # Áreas ativadas por cada regra
+    # Aplica os níveis de ativação das regras (fatiamento / clipping)
     atv_b = np.fmin(regras['barato'], y_barato)
     atv_j = np.fmin(regras['justo'], y_justo)
     atv_c = np.fmin(regras['caro'], y_caro)
@@ -82,7 +84,7 @@ def plotar_graficos_reais(duracao_val, dificuldade_val):
     agregado = np.fmax(atv_b, np.fmax(atv_j, np.fmax(atv_c, atv_mc)))
     zeros = np.zeros(500)
 
-    # Preenche as áreas ativadas (cores transparentes)
+    # Preenche as áreas ativadas para visualização
     ax2.fill_between(x_preco, zeros, atv_b, facecolor='blue', alpha=0.3, label='Barato')
     ax2.fill_between(x_preco, zeros, atv_j, facecolor='green', alpha=0.3, label='Justo')
     ax2.fill_between(x_preco, zeros, atv_c, facecolor='orange', alpha=0.3, label='Caro')

@@ -4,22 +4,12 @@ import fuzzy_logic
 import graphy
 import gui
 
-# Programa principal / launcher
-# Este arquivo fornece duas formas de execução do sistema:
-# - Modo terminal: interação por linha de comando (função `executar_modo_terminal`).
-# - Modo gráfico: abre a interface Tkinter (função `executar_modo_grafico`).
 def limpar_tela():
-    # Limpa a tela do terminal
     os.system('cls' if os.name == 'nt' else 'clear')
-    # Essse 'if' é para verificar o sistema operacional,
-    # como eu uso Linux o comando é 'clear', ja no Windows é 'cls'
 
 def executar_modo_terminal():
-    # Modo de execução via terminal
-    # Foi utilizado para testar a logica fuzzy antes de implementar a GUI
     janela_escolha.destroy()
     
-    # Loop principal do modo terminal: lê entradas, calcula e mostra resultados
     while True:
         limpar_tela()
         print("================")
@@ -28,13 +18,14 @@ def executar_modo_terminal():
         print("Digite 'sair' a qualquer momento para fechar.\n")
 
         try:
-            # Entradas do Usuario
+            # entrada do usuário
             entrada_duracao = input(">> Digite a Duração (horas): ")
             if entrada_duracao.lower() == 'sair': break
             duracao = float(entrada_duracao)
 
-            if duracao < 0 or duracao > 24:
-                print("\n[!] A duração deve ser entre 0 e 24 horas.")
+            # Limite: o sistema trabalha entre 0 e 42 horas
+            if duracao < 0 or duracao > 42:
+                print("\n[!] A duração deve ser entre 0 e 42 horas.")
                 input("Enter para continuar...")
                 continue
 
@@ -42,24 +33,24 @@ def executar_modo_terminal():
             if entrada_dificuldade.lower() == 'sair': break
             dificuldade = float(entrada_dificuldade)
             
+            # Validação simples para dificuldade (0-10)
             if dificuldade < 0 or dificuldade > 10:
                 print("\n[!] A dificuldade deve ser entre 0 e 10.")
                 input("Enter para continuar...")
                 continue
 
-            # Calculos Fuzzy: calcula graus, aplica regras e defuzzifica
+            # Executa o motor fuzzy e apresenta resultado
             print("\nCalculando...")
             graus_dur = fuzzy_logic.calcular_graus_duracao(duracao)
             graus_dif = fuzzy_logic.calcular_graus_dificuldade(dificuldade)
             regras = fuzzy_logic.calcular_regras(graus_dur, graus_dif)
             preco_final = fuzzy_logic.defuzzificar(regras)
 
-            # Resultados
             print("-" * 40)
             print(f"VALOR SUGERIDO: R$ {preco_final:.2f}")
             print("-" * 40)
 
-            # Plota os Graficos
+            # Pergunta se o usuário quer ver uma explicação visual
             ver = input("\nVer gráfico? (s/n): ")
             if ver.lower() == 's':
                 graphy.plotar_graficos_reais(duracao, dificuldade)
@@ -71,10 +62,7 @@ def executar_modo_terminal():
             input("Enter para continuar...")
 
 def executar_modo_grafico():
-    # Fecha a janela de escolha e
-    # abre a interface grafica
     janela_escolha.destroy()
-    
     root_app = tk.Tk()
     app = gui.FuzzyApp(root_app)
     root_app.mainloop()
@@ -102,5 +90,4 @@ def iniciar_launcher():
     janela_escolha.mainloop()
 
 if __name__ == "__main__":
-    # Ponto de entrada: inicia o launcher que permite escolher o modo
     iniciar_launcher()
